@@ -1,33 +1,41 @@
-import React, { useState, useEffect } from 'react'
-import { Box, HStack, Text, Image } from '@chakra-ui/react'
+import React from "react";
+import { Box, Text, useColorMode, Wrap, WrapItem } from "@chakra-ui/react";
+import { useState } from "react";
+
+interface Movie {
+    Title: string;
+    Year: string;
+    imdbID: string;
+    Type: string;
+    Poster: string;
+    Genre: string;
+  }
 
 const Category = () => {
-  const [genres, setGenres] = useState([]); // Create a state variable to store the genres
-    
-  useEffect(() => {
-    fetch('http://api.example.com/genres') // Fetch the genres from the API
-      .then((response) => response.json())
-      .then((data) => setGenres(data))
-      .catch((error: any) => console.error('Error fetching:', error))
-  }, []);
-  
-  return (
-    <Box overflow="auto" whiteSpace="nowrap" padding="20px" bg="gray.800" mt="10">
-        <Text fontSize="2xl" color="white">
-            Genres
-        </Text>
-        <HStack spacing="20px">
-            {genres.map((genre: any, index: number) => (
-            <Box key={index} bg="gray.700" borderRadius="lg" padding="20px">
-                <Image src={genre.poster} alt={genre.title} />
-                <Text color="white" isTruncated>
-                {genre.title}
-                </Text>
-            </Box>
-            ))}
-        </HStack>
-    </Box>
-  )
-}
+  const { colorMode } = useColorMode(); // Use the color mode hook
+  const [movies, setMovies] = useState<Movie[]>([]);
 
-export default Category
+  return (
+    <Box padding="20px" mt="10">
+      <Text fontSize="2xl" mb="4" color={colorMode === "dark" ? "white" : "black"}>
+        Genres
+      </Text>
+      <Wrap spacing="20px">
+        {movies.map((movie) => (
+          <WrapItem
+            key={movie.imdbID}
+            bg={colorMode === "dark" ? "gray.600" : "gray.200"}
+            borderRadius="lg"
+            padding="20px"
+          >
+            <Text color={colorMode === "dark" ? "white" : "black"} isTruncated>
+              {movie.Genre}
+            </Text>
+          </WrapItem>
+        ))}
+      </Wrap>
+    </Box>
+  );
+};
+
+export default Category;
