@@ -1,8 +1,10 @@
+// Importer nødvendige komponenter og hooks fra biblioteker
 import { Box, HStack, Text, Image, useColorMode, Link } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import Carousel from "./carousel/Carousel";
 
+// Definerer en interface til at beskrive strukturen af et filmobjekt
 interface Movie {
   Title: string;
   Year: string;
@@ -12,18 +14,20 @@ interface Movie {
   Genre: string;
 }
 
+// Definerer Watchlist komponenten
 const Watchlist = () => {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const { colorMode } = useColorMode();
-  const colorSwitch = colorMode === "dark" ? "white" : "black";
+  const [movies, setMovies] = useState<Movie[]>([]); // Opretter en state variabel for film
+  const { colorMode } = useColorMode(); // Bruger colorMode hook
+  const colorSwitch = colorMode === "dark" ? "white" : "black"; // Skifter farve baseret på colorMode
 
+  // Bruger useEffect hook til at hente filmdata når komponenten er monteret
   useEffect(() => {
     fetch("http://www.omdbapi.com/?i=tt3896198&apikey=a5543599")
       .then((response) => response.json())
       .then((data) => {
-        // Check if the response is successful and has a title property
+        // Tjekker om svaret er succesfuldt og har en titel egenskab
         if (data && data.Title) {
-          setMovies([data]); // Wrap the data in an array
+          setMovies([data]); // Indpakker data i et array
         } else {
           throw new Error("Invalid movie data");
         }
@@ -31,6 +35,7 @@ const Watchlist = () => {
       .catch((error: unknown) => console.error("Error fetching:", error));
   }, []);
 
+  // Returnerer JSX, der repræsenterer UI for Watchlist komponenten
   return (
     <Box padding="30px">
       <Text fontSize="2xl" color={colorSwitch}>
@@ -61,4 +66,5 @@ const Watchlist = () => {
   );
 };
 
+// Eksporterer Watchlist komponenten som standard eksport
 export default Watchlist;
