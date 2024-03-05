@@ -1,7 +1,13 @@
 import { IoIosHeart, IoIosHeartEmpty } from "react-icons/io";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
-const LikeButton = ({ movieId, favorites, setFavorites }) => {
+interface Props {
+  movieId: string;
+  favorites: Set<string>;
+  setFavorites: React.Dispatch<React.SetStateAction<Set<string>>>;
+}
+
+const LikeButton = ({ movieId, favorites, setFavorites }: Props) => {
   const [liked, setIsLiked] = useState(false);
 
   useEffect(() => {
@@ -18,10 +24,10 @@ const LikeButton = ({ movieId, favorites, setFavorites }) => {
     setFavorites(newFavorites);
   };
 
-  return (
-    liked ? 
-      <IoIosHeart color="#ff6b81" size={20} onClick={toggle} /> :
-      <IoIosHeartEmpty size={20} onClick={toggle} />
+  return liked ? (
+    <IoIosHeart color="#ff6b81" size={20} onClick={toggle} />
+  ) : (
+    <IoIosHeartEmpty size={20} onClick={toggle} />
   );
 };
 

@@ -9,6 +9,7 @@ import {
   VStack,
   Heading,
 } from "@chakra-ui/react";
+import LikeButton from "./LikeButton";
 
 interface MovieDetailsProps {
   Title: string;
@@ -27,7 +28,9 @@ interface Props {
 
 const MovieDetails = ({ favorites, setFavorites }: Props) => {
   let { id } = useParams<{ id: string }>();
-  const [movieDetails, setMovieDetails] = useState<MovieDetailsProps | null>(null);
+  const [movieDetails, setMovieDetails] = useState<MovieDetailsProps | null>(
+    null
+  );
   const bgColor = useColorModeValue("gray.100", "gray.700");
   const borderColor = useColorModeValue("gray.200", "gray.600");
 
@@ -60,12 +63,13 @@ const MovieDetails = ({ favorites, setFavorites }: Props) => {
       overflow="auto"
       m="4"
       p="4"
+      justifyContent="space-around"
     >
       <Box flexShrink={0}>
         <Image
           src={movieDetails.Poster}
           alt={movieDetails.Title}
-          boxSize={{ base: "100%", md: "200px" }}
+          boxSize={{ base: "100%", md: "305px" }}
           width="100%" // Image will take up 100% of the Box width
           objectFit="contain"
         />
@@ -75,6 +79,11 @@ const MovieDetails = ({ favorites, setFavorites }: Props) => {
         <Text fontSize="lg">{movieDetails.Genre}</Text>
         <Text fontSize="lg">{movieDetails.Year}</Text>
         <Text fontSize="lg">{movieDetails.Type}</Text>
+        <LikeButton
+          movieId={movieDetails.imdbID}
+          favorites={favorites}
+          setFavorites={setFavorites}
+        />
       </VStack>
     </Flex>
   );

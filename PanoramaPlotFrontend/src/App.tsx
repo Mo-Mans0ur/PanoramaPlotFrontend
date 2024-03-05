@@ -7,8 +7,7 @@ import Navbar from "./components/Navbar";
 import Watchlist from "./components/Watchlist";
 import Category from "./components/Category";
 import MovieDetails from "./components/MovieDetail";
-import LikeButton from './components/LikeButton';
-
+import LikeButton from "./components/LikeButton";
 
 // Define an interface to describe the structure of the movieQuery object
 export interface MovieQuery {
@@ -41,38 +40,45 @@ function App() {
         </GridItem>
         <GridItem area={"main"}>
           <Switch>
-            <Route
-              exact
-              path="/"
-              render={(routeProps) => (
-                <Watchlist {...routeProps} movieQuery={movieQuery} />
-              )}
-            />
-            <Route
-              path="/category"
-              render={(routeProps) => (
-                <Category {...routeProps} movieQuery={movieQuery} />
-              )}
-            />
-            <Route
-              path="/movie/:id"
-              render={(routeProps) => <MovieDetails {...routeProps} />}
-            />
-            <Route
-  path="/movie/:id"
-  render={(routeProps) => (
-    <MovieDetails
-      {...routeProps}
-      favorites={favorites}
-      setFavorites={setFavorites}
-      // Pass down LikeButton here if needed
-      LikeButton={<LikeButton
-                    movieId={routeProps.match.params.id}
-                    favorites={favorites}
-                    setFavorites={setFavorites} />}
-    />
-  )}
-/>
+            <Router>
+              <Grid
+                templateAreas={{ base: '"nav" "main"' }}
+                templateRows={"auto 1fr"}
+                h="100vh"
+              >
+                <GridItem area={"nav"}>
+                  {/* Navbar and its functionality */}
+                </GridItem>
+                <GridItem area={"main"}>
+                  <Switch>
+                    <Route
+                      exact
+                      path="/"
+                      render={(routeProps) => (
+                        <Watchlist {...routeProps} movieQuery={movieQuery} />
+                      )}
+                    />
+                    <Route
+                      path="/category"
+                      render={(routeProps) => (
+                        <Category {...routeProps} movieQuery={movieQuery} />
+                      )}
+                    />
+                    <Route
+                      path="/movie/:id"
+                      render={(routeProps) => (
+                        <MovieDetails
+                          {...routeProps}
+                          favorites={favorites}
+                          setFavorites={setFavorites}
+                        />
+                      )}
+                    />
+                    {/* Remove the duplicate Route */}
+                  </Switch>
+                </GridItem>
+              </Grid>
+            </Router>
           </Switch>
         </GridItem>
       </Grid>
