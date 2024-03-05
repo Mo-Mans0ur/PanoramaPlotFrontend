@@ -1,7 +1,7 @@
 // Importer nødvendige komponenter og hooks fra biblioteker
 import { Box, HStack, Text, Image, useColorMode, Link } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Carousel from "./carousel/Carousel";
 
 // Definerer en interface til at beskrive strukturen af et filmobjekt
