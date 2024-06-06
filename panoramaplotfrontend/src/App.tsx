@@ -7,7 +7,7 @@ import Category from './components/Category';
 import MovieDetails from './components/MovieDetails';
 import theme from './theme';
 import './styles/App.css';
-import { MovieQuery } from './types'; // Import the type
+import { MovieQuery } from './types';
 
 const App: React.FC = () => {
   const [movieQuery, setMovieQuery] = useState<MovieQuery>({ searchText: '' });
@@ -19,9 +19,9 @@ const App: React.FC = () => {
       <Router>
         <Navbar onSearch={(searchText) => setMovieQuery({ searchText })} />
         <Routes>
-          <Route path="/" element={<Watchlist movieQuery={movieQuery} />} />
-          <Route path="/category" element={<Category movieQuery={movieQuery} />} />
-          <Route path="/movie/:id" element={<MovieDetails favorites={favorites} setFavorites={setFavorites} />} />
+          <Route path="/" element={<Watchlist movieQuery={movieQuery} favorites={favorites} setFavorites={setFavorites} />} />
+          <Route path="/category" element={<Category movieQuery={movieQuery} favorites={favorites} setFavorites={setFavorites} />} />
+          <Route path="/movies/:id" element={<MovieDetails favorites={favorites} setFavorites={setFavorites} />} />
         </Routes>
       </Router>
     </ChakraProvider>

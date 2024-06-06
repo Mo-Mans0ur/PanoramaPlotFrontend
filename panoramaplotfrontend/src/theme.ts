@@ -36,6 +36,20 @@ const theme = extendTheme({
       900: '#0d0d0d',
     },
   },
+  components: {
+    Text: {
+      baseStyle: {
+        fontWeight: 'bold',
+      },
+      variants: {
+        movieTitle: (props: GlobalStyleProps) => ({
+          fontSize: 'lg',
+          color: props.colorMode === 'dark' ? 'white' : 'black',
+          textShadow: '0 1px 3px rgba(0, 0, 0, 0.6)',
+        }),
+      },
+    },
+  },
 });
 
 export default theme;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Slider from 'react-slick';
 import '../styles/Carousel.css';
 
@@ -7,13 +7,13 @@ interface CarouselProps {
 }
 
 const Carousel: React.FC<CarouselProps> = ({ children }) => {
-  const settings = {
+  const settings = useMemo(() => ({
     dots: true,
     infinite: true,
     speed: 500,
     slidesToShow: 3,
     slidesToScroll: 1,
-  };
+  }), []);
 
   return (
     <Slider {...settings}>
@@ -22,4 +22,4 @@ const Carousel: React.FC<CarouselProps> = ({ children }) => {
   );
 };
 
-export default Carousel;
+export default React.memo(Carousel);
