@@ -4,6 +4,7 @@ import { Box, Text, Image, Spinner, Center, useColorMode, IconButton } from '@ch
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
 interface MovieDetailsProps {
+  movieQuery: { searchText: string };
   favorites: Set<string>;
   setFavorites: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
@@ -11,7 +12,7 @@ interface MovieDetailsProps {
 interface MovieDetail {
   Adult: boolean;
   BackdropPath: string;
-  GenreIds: number[];
+  GenreIds: number[] | null;
   Id: number;
   OriginalLanguage: string;
   OriginalTitle: string;
@@ -24,7 +25,7 @@ interface MovieDetail {
   VoteCount: number;
 }
 
-const MovieDetails: React.FC<MovieDetailsProps> = ({ favorites, setFavorites }) => {
+const MovieDetails: React.FC<MovieDetailsProps> = ({ movieQuery, favorites, setFavorites }) => {
   const { id } = useParams<{ id: string }>();
   const [movie, setMovie] = useState<MovieDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -37,27 +38,13 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ favorites, setFavorites }) 
       setLoading(true);
       setError(null);
       try {
-        console.log(`Fetching details for movie ID: ${id}`);
-        const response = await fetch(`http://localhost:5074/movies/${id}`);
+        const response = await fetch(`http://localhost:5074/movie/${id}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const responseText = await response.text(); // Get the raw response text
-
-        try {
-          const data = JSON.parse(responseText); // Attempt to parse as JSON
-          if (data.data) {
-            setMovie(data.data); // Directly set the data
-          } else {
-            throw new Error('No movie data found');
-          }
-          console.log("Fetched movie details:", data.data);
-        } catch (jsonError) {
-          console.error('Failed to parse JSON:', responseText);
-          throw new Error('Invalid JSON response');
-        }
+        const data = await response.json();
+        setMovie(data.data);
       } catch (error) {
-        console.error('Error fetching movie details:', error);
         setError('Failed to fetch movie details. Please try again later.');
       } finally {
         setLoading(false);
@@ -115,11 +102,11 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ favorites, setFavorites }) 
         boxShadow="lg"
         className={`movie-details ${colorMode}`}
       >
-        <Image src={`http://image.tmdb.org/t/p/w500${movie.PosterPath}`} alt={movie.Title} />
+        <Image src={`http://image.tmdb.org/t/p/w500${movie.PosterPath}`} alt={movie.Title} objectFit="cover" />
         <Box p={6}>
-          <Text fontWeight="bold" fontSize="2xl">{movie.Title}</Text>
-          <Text fontSize="md" color="gray.500">{movie.ReleaseDate}</Text>
-          <Text mt={4}><strong>Genre:</strong> {movie.GenreIds.join(', ')}</Text>
+          <Text fontWeight="bold" fontSize="2xl" mb={2}>{movie.Title}</Text>
+          <Text fontSize="md" color="gray.500" mb={4}>{new Date(movie.ReleaseDate).toDateString()}</Text>
+          <Text mt={4}><strong>Genre:</strong> {movie.GenreIds ? movie.GenreIds.join(', ') : 'N/A'}</Text>
           <Text mt={2}><strong>Language:</strong> {movie.OriginalLanguage}</Text>
           <Text mt={2}><strong>Overview:</strong> {movie.Overview}</Text>
           <Text mt={2}><strong>Popularity:</strong> {movie.Popularity}</Text>

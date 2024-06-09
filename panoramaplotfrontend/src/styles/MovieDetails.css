@@ -1,18 +1,55 @@
-.movie-details {
+.movie-details-container {
+    max-width: 800px;
+    margin: 20px auto;
     padding: 20px;
-    background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #1a202c; /* Adjust based on light/dark mode */
+    color: white; /* Adjust based on light/dark mode */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .movie-image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
     margin-bottom: 20px;
-}
-
-.movie-details img {
+  }
+  
+  .movie-image {
     max-width: 100%;
+    height: auto;
     border-radius: 10px;
+  }
+  
+  .movie-info {
+    width: 100%;
+  }
+  
+  .movie-title {
+    font-size: 2rem;
+    font-weight: bold;
     margin-bottom: 10px;
-}
-
-.movie-details h2 {
     text-align: center;
+  }
+  
+  .movie-date {
+    color: gray;
     margin-bottom: 20px;
-}
+    text-align: center;
+  }
+  
+  .movie-genre,
+  .movie-text {
+    margin-bottom: 10px;
+  }
+  
+  .movie-favorite-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+  

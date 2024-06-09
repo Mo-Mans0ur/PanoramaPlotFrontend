@@ -1,27 +1,34 @@
+// src/App.tsx
 import React, { useState } from 'react';
-import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ChakraProvider } from '@chakra-ui/react';
 import Navbar from './components/Navbar';
 import Watchlist from './components/Watchlist';
-import Category from './components/Category';
 import MovieDetails from './components/MovieDetails';
+import Category from './components/Category';
+import Favorites from './components/Favorites';
+import Login from './components/Login';
 import theme from './theme';
 import './styles/App.css';
-import { MovieQuery } from './types';
 
 const App: React.FC = () => {
-  const [movieQuery, setMovieQuery] = useState<MovieQuery>({ searchText: '' });
+  const [movieQuery, setMovieQuery] = useState({ searchText: '' });
   const [favorites, setFavorites] = useState<Set<string>>(new Set<string>());
+
+  const handleSearch = (searchText: string) => {
+    setMovieQuery({ searchText });
+  };
 
   return (
     <ChakraProvider theme={theme}>
-      <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <Router>
-        <Navbar onSearch={(searchText) => setMovieQuery({ searchText })} />
+        <Navbar onSearch={handleSearch} />
         <Routes>
           <Route path="/" element={<Watchlist movieQuery={movieQuery} favorites={favorites} setFavorites={setFavorites} />} />
           <Route path="/category" element={<Category movieQuery={movieQuery} favorites={favorites} setFavorites={setFavorites} />} />
-          <Route path="/movies/:id" element={<MovieDetails favorites={favorites} setFavorites={setFavorites} />} />
+          <Route path="/movies/:id" element={<MovieDetails movieQuery={movieQuery} favorites={favorites} setFavorites={setFavorites} />} />
+          <Route path="/favorites" element={<Favorites favorites={favorites} setFavorites={setFavorites} />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </Router>
     </ChakraProvider>
