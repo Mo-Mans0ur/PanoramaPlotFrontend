@@ -19,7 +19,7 @@ jobs:
           node-version: '10.x'
 
       - name: npm install, build, and test
-        working-directory: frontend # Adjust this path to your subdirectory
+        working-directory: ./frontend # Adjust this path to your subdirectory
         run: |
           npm install
           npm run build --if-present
@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: node-app
-          path: frontend # Adjust this path to your subdirectory
+          path: ./frontend # Adjust this path to your subdirectory
 
   deploy:
     runs-on: ubuntu-latest
@@ -59,4 +59,4 @@ jobs:
         with:
           app-name: 'PanoramaPlot-Frontend'
           slot-name: 'Production'
-          package: frontend # Adjust this path to your subdirectory
+          package: ./frontend # Adjust this path to your subdirectory
