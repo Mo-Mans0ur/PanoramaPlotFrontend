@@ -15,14 +15,15 @@ import { jwtDecode } from 'jwt-decode';
 
 interface NavbarProps {
   onSearch: (data: any) => void;
+  onSearchResults: (results: any[]) => void;
 }
 
 interface JwtPayload {
-  unique_name: string; // Add the unique_name property to the JwtPayload interface
+  unique_name: string;
   // Add other properties as needed based on your token structure
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onSearch }) => {
+const Navbar: React.FC<NavbarProps> = ({ onSearch, onSearchResults }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [searchText, setSearchText] = useState('');
   const { colorMode, toggleColorMode } = useColorMode();
@@ -41,11 +42,10 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch }) => {
     if (token) {
       setIsLoggedIn(true);
       const decodedToken = jwtDecode<JwtPayload>(token);
-      setUsername(decodedToken.unique_name ); // Adjust based on your token structure
+      setUsername(decodedToken.unique_name);
     }
   }, []);
 
-  
   const handleSearch = async () => {
     try {
       const response = await fetch(`http://localhost:5074/movies/search/${searchText}/1`, {
@@ -61,12 +61,12 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch }) => {
       }
 
       const data = await response.json();
-      onSearch(data.data);
+      onSearch(searchText);
+      onSearchResults(data.data);
     } catch (error) {
       setError((error as Error).message);
     }
   };
-
 
   const handleLogin = async () => {
     try {
@@ -84,7 +84,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch }) => {
       }
 
       const data = await response.json();
-      Cookies.set('token', data.Token, { expires: 1 }); // Expires in 1 day
+      Cookies.set('token', data.Token, { expires: 1 / 24 }); // Expires in 1 hour
       setIsLoggedIn(true);
       setUsername(loginUsername);
       onClose();

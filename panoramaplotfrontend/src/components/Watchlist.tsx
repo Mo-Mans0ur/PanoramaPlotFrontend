@@ -1,5 +1,4 @@
-// src/components/Watchlist.tsx
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Text,
@@ -16,69 +15,55 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import "../styles/Watchlist.css";
 
 interface Movie {
-  title: string;
+  OriginalTitle: string;
   year: string;
-  imdbID: string;
+  Id: string;
   type: string;
   posterPath: string;
   genre: string;
 }
 
 interface WatchlistProps {
-  movieQuery: { searchText: string };
+  searchResults: Movie[];
+  searchText: string;
+  nextUrl: string;
+  prevUrl: string;
   favorites: Set<string>;
   setFavorites: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
 const Watchlist: React.FC<WatchlistProps> = ({
-  movieQuery,
+  searchResults,
+  searchText,
+  nextUrl,
+  prevUrl,
   favorites,
   setFavorites,
 }) => {
-  const [movies, setMovies] = useState<Movie[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const { colorMode } = useColorMode();
 
-  const fetchMovies = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`http://localhost:5074/movies`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      const mappedMovies = data.data.map((movie: any, index: number) => ({
-        title: movie.Title ?? "N/A",
-        year: movie.ReleaseDate ?? "N/A",
-        imdbID: movie.Id ? movie.Id.toString() : `N/A-${index}`, // Ensure unique key
-        type: movie.Type ?? "N/A",
-        posterPath: movie.PosterPath
-          ? `http://image.tmdb.org/t/p/w500${movie.PosterPath}`
-          : "/path/to/default/poster.jpg",
-        genre: movie.Genre ?? "N/A",
-      }));
-      setMovies(mappedMovies);
-      setFilteredMovies(mappedMovies); // Set initial filteredMovies
-    } catch (error) {
-      setError("Failed to fetch movies. Please try again later.");
-    } finally {
+  useEffect(() => {
+    console.log("Search Results:", searchResults);
+    console.log("Search Text:", searchText);
+
+    if (searchResults && searchResults.length > 0) {
+      const filtered = searchResults.filter((movie) => {
+        console.log("Movie Object:", movie);
+        // Ensure searchText is treated as a string
+        return movie.OriginalTitle?.toLowerCase().includes(
+          searchText.toLowerCase()
+        );
+      });
+      console.log("Filtered Movies (new):", filtered);
+      setFilteredMovies(filtered);
+      setLoading(false);
+    } else {
+      console.log("No search results found.");
       setLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    fetchMovies();
-  }, [fetchMovies]);
-
-  useEffect(() => {
-    const filtered = movies.filter((movie) =>
-      movie.title.toLowerCase().includes(movieQuery.searchText.toLowerCase())
-    );
-    setFilteredMovies(filtered);
-  }, [movieQuery.searchText, movies]);
+  }, [searchText, searchResults]);
 
   const toggleFavorite = (id: string) => {
     setFavorites((prevFavorites) => {
@@ -100,19 +85,19 @@ const Watchlist: React.FC<WatchlistProps> = ({
     );
   }
 
-  if (error) {
+  if (filteredMovies.length === 0) {
     return (
       <Center height="100vh">
-        <Text>{error}</Text>
+        <Text>No movies found.</Text>
       </Center>
     );
   }
 
   const favoriteMovies = filteredMovies.filter((movie) =>
-    favorites.has(movie.imdbID)
+    favorites.has(movie.Id)
   );
   const otherMovies = filteredMovies.filter(
-    (movie) => !favorites.has(movie.imdbID)
+    (movie) => !favorites.has(movie.Id)
   );
 
   return (
@@ -123,54 +108,61 @@ const Watchlist: React.FC<WatchlistProps> = ({
             Your Favorite Movies
           </Heading>
           <Grid templateColumns="repeat(auto-fill, minmax(200px, 1fr))" gap={6}>
-            {favoriteMovies.map((movie) => (
-              <Box
-                key={movie.imdbID}
-                className={`movie-card ${colorMode}`}
-                borderWidth="1px"
-                borderRadius="lg"
-                overflow="hidden"
-                boxShadow="lg"
-                _hover={{ transform: "scale(1.05)" }}
-                transition="transform 0.2s"
-              >
-                <RouterLink to={`/movies/${movie.imdbID}`}>
-                  <Image
-                    src={movie.posterPath}
-                    alt={movie.title}
-                    onError={(e) =>
-                      (e.currentTarget.src = "/path/to/default/poster.jpg")
+            {favoriteMovies.map((movie) => {
+              if (!movie.Id) {
+                console.error("Movie object missing Id:", movie);
+                return null;
+              }
+              console.log("Favorite Movie Object:", movie);
+              return (
+                <Box
+                  key={movie.Id}
+                  className={`movie-card ${colorMode}`}
+                  borderWidth="1px"
+                  borderRadius="lg"
+                  overflow="hidden"
+                  boxShadow="lg"
+                  _hover={{ transform: "scale(1.05)" }}
+                  transition="transform 0.2s"
+                >
+                  <RouterLink to={`/movies/${movie.Id}`}>
+                    <Image
+                      src={`https://image.tmdb.org/t/p/w500${movie.posterPath}`} // Ensure correct poster path
+                      alt={movie.OriginalTitle}
+                      onError={(e) =>
+                        (e.currentTarget.src = "/path/to/default/poster.jpg")
+                      }
+                    />
+                    <Box p={4}>
+                      <Text
+                        fontWeight="bold"
+                        fontSize="xl"
+                        className="movie-title"
+                      >
+                        {movie.OriginalTitle}
+                      </Text>
+                    </Box>
+                  </RouterLink>
+                  <IconButton
+                    aria-label={
+                      favorites.has(movie.Id)
+                        ? "Remove from favorites"
+                        : "Add to favorites"
                     }
+                    icon={
+                      favorites.has(movie.Id) ? <FaHeart /> : <FaRegHeart />
+                    }
+                    onClick={() => toggleFavorite(movie.Id)}
+                    variant="ghost"
+                    colorScheme={favorites.has(movie.Id) ? "red" : "gray"}
+                    size="lg"
+                    position="absolute"
+                    top="4"
+                    right="4"
                   />
-                  <Box p={4}>
-                    <Text
-                      fontWeight="bold"
-                      fontSize="xl"
-                      className="movie-title"
-                    >
-                      {movie.title}
-                    </Text>
-                  </Box>
-                </RouterLink>
-                <IconButton
-                  aria-label={
-                    favorites.has(movie.imdbID)
-                      ? "Remove from favorites"
-                      : "Add to favorites"
-                  }
-                  icon={
-                    favorites.has(movie.imdbID) ? <FaHeart /> : <FaRegHeart />
-                  }
-                  onClick={() => toggleFavorite(movie.imdbID)}
-                  variant="ghost"
-                  colorScheme={favorites.has(movie.imdbID) ? "red" : "gray"}
-                  size="lg"
-                  position="absolute"
-                  top="4"
-                  right="4"
-                />
-              </Box>
-            ))}
+                </Box>
+              );
+            })}
           </Grid>
         </Box>
       )}
@@ -178,48 +170,55 @@ const Watchlist: React.FC<WatchlistProps> = ({
         All Movies
       </Heading>
       <Grid templateColumns="repeat(auto-fill, minmax(200px, 1fr))" gap={6}>
-        {otherMovies.map((movie) => (
-          <Box
-            key={movie.imdbID}
-            className={`movie-card ${colorMode}`}
-            borderWidth="1px"
-            borderRadius="lg"
-            overflow="hidden"
-            boxShadow="lg"
-            _hover={{ transform: "scale(1.05)" }}
-            transition="transform 0.2s"
-          >
-            <RouterLink to={`/movies/${movie.imdbID}`}>
-              <Image
-                src={movie.posterPath}
-                alt={movie.title}
-                onError={(e) =>
-                  (e.currentTarget.src = "/path/to/default/poster.jpg")
+        {otherMovies.map((movie) => {
+          if (!movie.Id) {
+            console.error("Movie object missing Id:", movie);
+            return null;
+          }
+          console.log("Other Movie Object:", movie);
+          return (
+            <Box
+              key={movie.Id}
+              className={`movie-card ${colorMode}`}
+              borderWidth="1px"
+              borderRadius="lg"
+              overflow="hidden"
+              boxShadow="lg"
+              _hover={{ transform: "scale(1.05)" }}
+              transition="transform 0.2s"
+            >
+              <RouterLink to={`/movies/${movie.Id}`}>
+                <Image
+                  src={`https://image.tmdb.org/t/p/w500${movie.posterPath}`} // Ensure correct poster path
+                  alt={movie.OriginalTitle}
+                  onError={(e) =>
+                    (e.currentTarget.src = "/path/to/default/poster.jpg")
+                  }
+                />
+                <Box p={4}>
+                  <Text fontWeight="bold" fontSize="xl" className="movie-title">
+                    {movie.OriginalTitle}
+                  </Text>
+                </Box>
+              </RouterLink>
+              <IconButton
+                aria-label={
+                  favorites.has(movie.Id)
+                    ? "Remove from favorites"
+                    : "Add to favorites"
                 }
+                icon={favorites.has(movie.Id) ? <FaHeart /> : <FaRegHeart />}
+                onClick={() => toggleFavorite(movie.Id)}
+                variant="ghost"
+                colorScheme={favorites.has(movie.Id) ? "red" : "gray"}
+                size="lg"
+                position="absolute"
+                top="4"
+                right="4"
               />
-              <Box p={4}>
-                <Text fontWeight="bold" fontSize="xl" className="movie-title">
-                  {movie.title}
-                </Text>
-              </Box>
-            </RouterLink>
-            <IconButton
-              aria-label={
-                favorites.has(movie.imdbID)
-                  ? "Remove from favorites"
-                  : "Add to favorites"
-              }
-              icon={favorites.has(movie.imdbID) ? <FaHeart /> : <FaRegHeart />}
-              onClick={() => toggleFavorite(movie.imdbID)}
-              variant="ghost"
-              colorScheme={favorites.has(movie.imdbID) ? "red" : "gray"}
-              size="lg"
-              position="absolute"
-              top="4"
-              right="4"
-            />
-          </Box>
-        ))}
+            </Box>
+          );
+        })}
       </Grid>
     </Box>
   );
