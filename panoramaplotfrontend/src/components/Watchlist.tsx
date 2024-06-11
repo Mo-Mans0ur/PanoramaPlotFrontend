@@ -19,7 +19,7 @@ interface Movie {
   year: string;
   Id: string;
   type: string;
-  posterPath: string;
+  PosterPath: string;
   genre: string;
 }
 
@@ -69,7 +69,7 @@ const Watchlist: React.FC<WatchlistProps> = ({
       fetchMovies();
     }
   }, [hasFetched]);
-
+  
   useEffect(() => {
     console.log("Search Text:", searchText);
     console.log("Search Results:", searchResults);
@@ -78,7 +78,7 @@ const Watchlist: React.FC<WatchlistProps> = ({
       setFilteredMovies(searchResults);
     }
   }, [searchText, searchResults]);
-
+  
   const toggleFavorite = (id: string) => {
     setFavorites((prevFavorites) => {
       const newFavorites = new Set(prevFavorites);
@@ -113,7 +113,7 @@ const Watchlist: React.FC<WatchlistProps> = ({
   const otherMovies = filteredMovies.filter(
     (movie) => !favorites.has(movie.Id)
   );
-
+  console.log("Filtered Movies:", filteredMovies);
   return (
     <Box p={4}>
       {favoriteMovies.length > 0 && (
@@ -141,7 +141,7 @@ const Watchlist: React.FC<WatchlistProps> = ({
                 >
                   <RouterLink to={`/movies/${movie.Id}`}>
                     <Image
-                      src={`https://image.tmdb.org/t/p/w500${movie.posterPath}`} // Ensure correct poster path
+                      src={`https://image.tmdb.org/t/p/w500${movie.PosterPath}`} // Ensure correct poster path
                       alt={movie.OriginalTitle}
                       onError={(e) =>
                         (e.currentTarget.src = "/path/to/default/poster.jpg")
@@ -203,11 +203,8 @@ const Watchlist: React.FC<WatchlistProps> = ({
             >
               <RouterLink to={`/movies/${movie.Id}`}>
                 <Image
-                  src={`https://image.tmdb.org/t/p/w500${movie.posterPath}`} // Ensure correct poster path
+                  src={`https://image.tmdb.org/t/p/w500/${movie.PosterPath}`} // Ensure correct poster path
                   alt={movie.OriginalTitle}
-                  onError={(e) =>
-                    (e.currentTarget.src = "/path/to/default/poster.jpg")
-                  }
                 />
                 <Box p={4}>
                   <Text

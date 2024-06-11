@@ -15,7 +15,7 @@ interface Movie {
   year: string;
   Id: string;
   type: string;
-  posterPath: string;
+  PosterPath: string;
   genre: string;
 }
 
@@ -28,11 +28,13 @@ const App: React.FC = () => {
 
   const handleSearch = async (searchText: string) => {
     setMovieQuery(searchText);
+
     // Perform the fetch and update searchResults here
     try {
       const response = await fetch(`http://localhost:5074/movies/search/${searchText}`);
       const data = await response.json();
-      setSearchResults(data.results);
+      console.log("SearchResults from App.tsx: ", data.data)
+      setSearchResults(data.data);
     } catch (error) {
       console.error("Error fetching search results:", error);
     }
