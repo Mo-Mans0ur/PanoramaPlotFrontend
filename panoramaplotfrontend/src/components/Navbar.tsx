@@ -13,32 +13,31 @@ import '../styles/Navbar.css';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
 
-interface NavbarProps {
-  onSearch: (data: any) => void;
-  onSearchResults: (results: any[]) => void;
-}
-
 interface JwtPayload {
   unique_name: string;
   // Add other properties as needed based on your token structure
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onSearch, onSearchResults }) => {
+interface NavbarProps {
+  onSearch: (searchText: string) => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onSearch }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [searchText, setSearchText] = useState('');
   const { colorMode, toggleColorMode } = useColorMode();
-  const bg = useColorModeValue('gray.800', 'gray.700');
-  const [loginUsername, setLoginUsername] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [registerUsername, setRegisterUsername] = useState('');
-  const [registerPassword, setRegisterPassword] = useState('');
+  const bg = useColorModeValue("gray.800", "gray.700");
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [registerUsername, setRegisterUsername] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState("");
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    const token = Cookies.get('token');
+    const token = Cookies.get("token");
     if (token) {
       setIsLoggedIn(true);
       const decodedToken = jwtDecode<JwtPayload>(token);
@@ -46,87 +45,63 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch, onSearchResults }) => {
     }
   }, []);
 
-  const handleSearch = async () => {
-    try {
-      const response = await fetch(`http://localhost:5074/movies/search/${searchText}/1`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to fetch movies');
-      }
-
-      const data = await response.json();
-      onSearch(searchText);
-      onSearchResults(data.data);
-    } catch (error) {
-      setError((error as Error).message);
-    }
-  };
-
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://localhost:5074/login', {
-        method: 'POST',
+      const response = await fetch("/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ Username: loginUsername, Password: loginPassword }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Invalid credentials');
-      }
-
       const data = await response.json();
-      Cookies.set('token', data.Token, { expires: 1 / 24 }); // Expires in 1 hour
+      Cookies.set("token", data.Token, { expires: 1 / 24 }); // Expires in 1 hour
       setIsLoggedIn(true);
       setUsername(loginUsername);
       onClose();
-    } catch (error) {
-      setError((error as Error).message);
+    } catch (error: any) {
+      setError(error.response?.data?.message || "Invalid credentials");
     }
   };
 
   const handleRegister = async () => {
     try {
-      const response = await fetch('http://localhost:5074/register', {
-        method: 'POST',
+      const response = await fetch("/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ Username: registerUsername, Password: registerPassword }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Registration failed');
-      }
-
       const data = await response.json();
-      Cookies.set('token', data.Token, { expires: 1 });
+      Cookies.set("token", data.Token, { expires: 1 });
       setIsLoggedIn(true);
       setUsername(registerUsername);
       onClose();
-    } catch (error) {
-      setError((error as Error).message);
+    } catch (error: any) {
+      setError(error.response?.data?.message || "Registration failed");
     }
   };
 
   const handleLogout = () => {
-    Cookies.remove('token');
+    Cookies.remove("token");
     setIsLoggedIn(false);
-    setUsername('');
+    setUsername("");
   };
 
   const handleTabChange = (index: number) => {
     setActiveTab(index);
     setError(null); // Clear error on tab change
+  };
+
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
+
+  const handleSearchClick = () => {
+    onSearch(searchText);
   };
 
   return (
@@ -137,22 +112,17 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch, onSearchResults }) => {
             <img src={logo} alt="Logo" />
           </Box>
         </RouterLink>
-        <Flex alignItems="center" className="navbar-search">
+        <Flex alignItems="center" className="navbar-buttons">
           <Input
-            placeholder="Search..."
+            placeholder="Search movies..."
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            bg="white"
-            color="black"
+            onChange={handleSearchInputChange}
             width="300px"
-            borderRadius="md"
-            mr={2}
+            marginRight="10px"
           />
-          <Button colorScheme="teal" onClick={handleSearch}>
+          <Button onClick={handleSearchClick} colorScheme="blue" mr={4}>
             Search
           </Button>
-        </Flex>
-        <Flex alignItems="center" className="navbar-buttons">
           {isLoggedIn ? (
             <Menu>
               <MenuButton as={Button} rightIcon={<Avatar size="sm" />}>
@@ -168,7 +138,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch, onSearchResults }) => {
             </Button>
           )}
           <Button onClick={toggleColorMode}>
-            {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+            {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
           </Button>
         </Flex>
       </Flex>
@@ -189,21 +159,37 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch, onSearchResults }) => {
                 <TabPanel>
                   <FormControl id="login-username" mb={4}>
                     <FormLabel>Username</FormLabel>
-                    <Input type="text" value={loginUsername} onChange={(e) => setLoginUsername(e.target.value)} />
+                    <Input
+                      type="text"
+                      value={loginUsername}
+                      onChange={(e) => setLoginUsername(e.target.value)}
+                    />
                   </FormControl>
                   <FormControl id="login-password" mb={4}>
                     <FormLabel>Password</FormLabel>
-                    <Input type="password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
+                    <Input
+                      type="password"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                    />
                   </FormControl>
                 </TabPanel>
                 <TabPanel>
                   <FormControl id="register-username" mb={4}>
                     <FormLabel>Username</FormLabel>
-                    <Input type="text" value={registerUsername} onChange={(e) => setRegisterUsername(e.target.value)} />
+                    <Input
+                      type="text"
+                      value={registerUsername}
+                      onChange={(e) => setRegisterUsername(e.target.value)}
+                    />
                   </FormControl>
                   <FormControl id="register-password" mb={4}>
                     <FormLabel>Password</FormLabel>
-                    <Input type="password" value={registerPassword} onChange={(e) => setRegisterPassword(e.target.value)} />
+                    <Input
+                      type="password"
+                      value={registerPassword}
+                      onChange={(e) => setRegisterPassword(e.target.value)}
+                    />
                   </FormControl>
                 </TabPanel>
               </TabPanels>

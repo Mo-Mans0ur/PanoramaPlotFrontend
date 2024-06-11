@@ -11,8 +11,7 @@ interface Movie {
 }
 
 interface CategoryProps {
-  searchResults: Movie[];
-  searchText: string;
+  
   nextUrl: string;
   prevUrl: string;
   favorites: Set<string>;
@@ -20,8 +19,7 @@ interface CategoryProps {
 }
 
 const Category: React.FC<CategoryProps> = ({
-  searchResults,
-  searchText,
+  
   nextUrl,
   prevUrl,
   favorites,
@@ -30,12 +28,9 @@ const Category: React.FC<CategoryProps> = ({
   return (
     <Box p={4}>
       {/* Render your category movies here */}
-      {searchResults.map((movie) => (
-        <Box key={movie.Id} p={4} shadow="md" borderWidth="1px">
-          <Text>{movie.title}</Text>
-          <Text>{movie.year}</Text>
-        </Box>
-      ))}
+      
+        
+      
     </Box>
   );
 };

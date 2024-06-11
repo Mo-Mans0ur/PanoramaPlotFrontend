@@ -1,34 +1,47 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ChakraProvider } from '@chakra-ui/react';
-import Navbar from './components/Navbar';
-import Watchlist from './components/Watchlist';
-import MovieDetails from './components/MovieDetails';
-import Category from './components/Category';
-import Favorites from './components/Favorites';
-import Login from './components/Login';
-import theme from './theme';
-import './styles/App.css';
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ChakraProvider } from "@chakra-ui/react";
+import Navbar from "./components/Navbar";
+import Watchlist from "./components/Watchlist";
+import MovieDetails from "./components/MovieDetails";
+import Category from "./components/Category";
+import Favorites from "./components/Favorites";
+import Login from "./components/Login";
+import theme from "./theme";
+import "./styles/App.css";
+
+interface Movie {
+  OriginalTitle: string;
+  year: string;
+  Id: string;
+  type: string;
+  posterPath: string;
+  genre: string;
+}
 
 const App: React.FC = () => {
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [movieQuery, setMovieQuery] = useState('');
+  const [movieQuery, setMovieQuery] = useState("");
   const [favorites, setFavorites] = useState<Set<string>>(new Set<string>());
-  const [nextUrl, setNextUrl] = useState<string>('');
-  const [prevUrl, setPrevUrl] = useState<string>('');
+  const [nextUrl, setNextUrl] = useState<string>("");
+  const [prevUrl, setPrevUrl] = useState<string>("");
+  const [searchResults, setSearchResults] = useState<Movie[]>([]);
 
-  const handleSearch = (searchText: string) => {
+  const handleSearch = async (searchText: string) => {
     setMovieQuery(searchText);
-  };
-
-  const handleSearchResults = (data: any[]) => {
-    setSearchResults(data);
+    // Perform the fetch and update searchResults here
+    try {
+      const response = await fetch(`http://localhost:5074/movies/search/${searchText}`);
+      const data = await response.json();
+      setSearchResults(data.results);
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    }
   };
 
   return (
     <ChakraProvider theme={theme}>
       <Router>
-        <Navbar onSearch={handleSearch} onSearchResults={handleSearchResults} />
+        <Navbar onSearch={handleSearch} />
         <Routes>
           <Route
             path="/"
@@ -47,8 +60,6 @@ const App: React.FC = () => {
             path="/category"
             element={
               <Category
-                searchResults={searchResults}
-                searchText={movieQuery}
                 nextUrl={nextUrl}
                 prevUrl={prevUrl}
                 favorites={favorites}
@@ -60,8 +71,6 @@ const App: React.FC = () => {
             path="/favorites"
             element={
               <Favorites
-                searchResults={searchResults}
-                searchText={movieQuery}
                 nextUrl={nextUrl}
                 prevUrl={prevUrl}
                 favorites={favorites}
@@ -73,8 +82,6 @@ const App: React.FC = () => {
             path="/movies/:id"
             element={
               <MovieDetails
-                searchResults={searchResults}
-                searchText={movieQuery}
                 nextUrl={nextUrl}
                 prevUrl={prevUrl}
                 favorites={favorites}

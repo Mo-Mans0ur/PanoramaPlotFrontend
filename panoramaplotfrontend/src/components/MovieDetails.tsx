@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Text, Image, useColorMode } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import "../styles/MovieDetails.css";
@@ -13,8 +13,6 @@ interface Movie {
 }
 
 interface MovieDetailsProps {
-  searchResults: Movie[];
-  searchText: string;
   nextUrl: string;
   prevUrl: string;
   favorites: Set<string>;
@@ -22,8 +20,6 @@ interface MovieDetailsProps {
 }
 
 const MovieDetails: React.FC<MovieDetailsProps> = ({
-  searchResults,
-  searchText,
   nextUrl,
   prevUrl,
   favorites,
@@ -31,28 +27,29 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
 }) => {
   const { id } = useParams<{ id: string }>();
   const { colorMode } = useColorMode();
+  const [movie, setMovie] = useState<Movie | null>(null);
 
-  const movie = searchResults.find((movie) => movie.Id === id);
+ 
+
+  const toggleFavorite = async () => {
+    try {
+      const response = await fetch('/movies/favorite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ movie })
+      });
+      const data = await response.json();
+      setFavorites(new Set(data.favorites));
+    } catch (error) {
+      console.error("Error updating favorites:", error);
+    }
+  };
 
   if (!movie) {
-    return (
-      <Box p={4}>
-        <Text>Movie not found</Text>
-      </Box>
-    );
+    return <Text>Loading...</Text>;
   }
-
-  const toggleFavorite = () => {
-    setFavorites((prevFavorites) => {
-      const newFavorites = new Set(prevFavorites);
-      if (newFavorites.has(movie.Id)) {
-        newFavorites.delete(movie.Id);
-      } else {
-        newFavorites.add(movie.Id);
-      }
-      return newFavorites;
-    });
-  };
 
   return (
     <Box p={4}>

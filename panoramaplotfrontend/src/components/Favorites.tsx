@@ -13,8 +13,7 @@ interface Movie {
 }
 
 interface FavoritesProps {
-  searchResults: Movie[];
-  searchText: string;
+  
   nextUrl: string;
   prevUrl: string;
   favorites: Set<string>;
@@ -22,8 +21,7 @@ interface FavoritesProps {
 }
 
 const Favorites: React.FC<FavoritesProps> = ({
-  searchResults,
-  searchText,
+  
   nextUrl,
   prevUrl,
   favorites,
@@ -31,13 +29,7 @@ const Favorites: React.FC<FavoritesProps> = ({
 }) => {
   return (
     <Box p={4}>
-      {searchResults.map((movie) => (
-        <Box key={movie.Id} p={4} shadow="md" borderWidth="1px">
-          <Text>{movie.title}</Text>
-          <Text>{movie.year}</Text>
-          <Image src={movie.posterPath} alt={movie.title} />
-        </Box>
-      ))}
+      
     </Box>
   );
 };

@@ -42,26 +42,40 @@ const Watchlist: React.FC<WatchlistProps> = ({
 }) => {
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasFetched, setHasFetched] = useState(false);
   const { colorMode } = useColorMode();
 
   useEffect(() => {
-    console.log("Search Results:", searchResults);
-    console.log("Search Text:", searchText);
+    const fetchMovies = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch("http://localhost:5074/movies");
+        if (!response.ok) {
+          const errorText = await response.text(); // Get the full error response
+          throw new Error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
+        }
+        const data = await response.json();
+        console.log("Fetched movie data:", data);
+        setFilteredMovies(data.data);
+        setHasFetched(true);
+      } catch (error) {
+        console.error("Error fetching movies:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (searchResults && searchResults.length > 0) {
-      const filtered = searchResults.filter((movie) => {
-        console.log("Movie Object:", movie);
-        // Ensure searchText is treated as a string
-        return movie.OriginalTitle?.toLowerCase().includes(
-          searchText.toLowerCase()
-        );
-      });
-      console.log("Filtered Movies (new):", filtered);
-      setFilteredMovies(filtered);
-      setLoading(false);
-    } else {
-      console.log("No search results found.");
-      setLoading(false);
+    if (!hasFetched) {
+      fetchMovies();
+    }
+  }, [hasFetched]);
+
+  useEffect(() => {
+    console.log("Search Text:", searchText);
+    console.log("Search Results:", searchResults);
+
+    if (searchText) {
+      setFilteredMovies(searchResults);
     }
   }, [searchText, searchResults]);
 
@@ -196,11 +210,15 @@ const Watchlist: React.FC<WatchlistProps> = ({
                   }
                 />
                 <Box p={4}>
-                  <Text fontWeight="bold" fontSize="xl" className="movie-title">
+                  <Text
+                    fontWeight="bold"
+                    fontSize="xl"
+                    className="movie-title"
+                  >
                     {movie.OriginalTitle}
                   </Text>
                 </Box>
-              </RouterLink>
+                </RouterLink>
               <IconButton
                 aria-label={
                   favorites.has(movie.Id)
