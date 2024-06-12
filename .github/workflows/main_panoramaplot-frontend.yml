@@ -19,7 +19,6 @@ jobs:
           node-version: '10.x'
 
       - name: Install dependencies, build, and test
-        working-directory: src  # Adjust this path to match your actual directory structure
         run: |
           npm install
           CI=false npm run build --if-present
@@ -29,7 +28,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: node-app
-          path: src # Adjust this path to match your actual directory structure
+          path: .  # Adjust this path if needed, but typically the build artifacts are in the root or a specific build directory
 
   deploy:
     runs-on: ubuntu-latest
@@ -59,4 +58,4 @@ jobs:
         with:
           app-name: 'PanoramaPlot-Frontend'
           slot-name: 'Production'
-          package: src  # Adjust this path to match your actual directory structure
+          package: .  # Adjust this path to match your actual build output directory
