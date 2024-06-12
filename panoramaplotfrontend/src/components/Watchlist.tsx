@@ -25,6 +25,7 @@ interface WatchlistProps {
   setFavorites: React.Dispatch<React.SetStateAction<Set<string>>>;
   nextUrl: string;
   prevUrl: string;
+  isLoggedIn: boolean;
 }
 
 const Watchlist: React.FC<WatchlistProps> = ({
@@ -33,13 +34,13 @@ const Watchlist: React.FC<WatchlistProps> = ({
   favorites,
   setFavorites,
   nextUrl,
-  prevUrl
+  prevUrl,
+  isLoggedIn,
 }) => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const { colorMode } = useColorMode();
-  const { isLoggedIn } = useAuth();
   const toast = useToast();
 
   useEffect(() => {
@@ -119,12 +120,13 @@ const Watchlist: React.FC<WatchlistProps> = ({
     );
   }
 
-  const favoriteMovies = movies.filter((movie) => favorites.has(movie.Id));
-  const otherMovies = movies.filter((movie) => !favorites.has(movie.Id));
+  const favoriteMovies = isLoggedIn
+    ? movies.filter((movie) => favorites.has(movie.Id))
+    : [];
 
   return (
     <Box p={4}>
-      {favoriteMovies.length > 0 && (
+      {isLoggedIn && favoriteMovies.length > 0 && (
         <Box mb={6}>
           <Heading as="h2" size="lg" mb={4}>
             Your Favorite Movies
@@ -189,7 +191,7 @@ const Watchlist: React.FC<WatchlistProps> = ({
         All Movies
       </Heading>
       <Grid templateColumns="repeat(auto-fill, minmax(200px, 1fr))" gap={6}>
-        {otherMovies.map((movie) => (
+        {movies.map((movie) => (
           <Box
             key={movie.Id}
             className={`movie-card ${colorMode}`}
