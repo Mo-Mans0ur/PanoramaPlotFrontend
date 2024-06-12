@@ -19,7 +19,7 @@ jobs:
           node-version: '10.x'
 
       - name: Install dependencies, build, and test
-        working-directory: ./frontend  # Adjust this path to match your actual directory structure
+        working-directory: src  # Adjust this path to match your actual directory structure
         run: |
           npm install
           CI=false npm run build --if-present
@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: node-app
-          path: ./frontend  # Adjust this path to match your actual directory structure
+          path: src # Adjust this path to match your actual directory structure
 
   deploy:
     runs-on: ubuntu-latest
@@ -59,4 +59,4 @@ jobs:
         with:
           app-name: 'PanoramaPlot-Frontend'
           slot-name: 'Production'
-          package: ./frontend  # Adjust this path to match your actual directory structure
+          package: src  # Adjust this path to match your actual directory structure
