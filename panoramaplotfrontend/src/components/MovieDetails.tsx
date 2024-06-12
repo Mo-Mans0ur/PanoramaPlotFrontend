@@ -1,22 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Box, Text, Image, useColorMode, Spinner,
+import { Box, Text, Image, Spinner,
   Center,
   Heading,
   IconButton } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import "../styles/MovieDetails.css";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
- 
-interface Movie {
-  
-  OriginalTitle: string;
-  year: string;
-  Id: string;
-  type: string;
-  PosterPath: string;
-  genre: string;
-  ReleaseDate: string;
-}
+import { Movie } from "../types";
 
 interface MovieDetailsProps {
   nextUrl: string;
@@ -25,9 +15,8 @@ interface MovieDetailsProps {
   setFavorites: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
-const MovieDetails: React.FC<MovieDetailsProps> = ({favorites, setFavorites}) => {
+const MovieDetails: React.FC<MovieDetailsProps> = ({nextUrl,prevUrl,favorites, setFavorites}) => {
   const { id } = useParams<{ id: string }>();
-  const { colorMode } = useColorMode();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -40,12 +29,13 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({favorites, setFavorites}) =>
 
         const mappedData: Movie = {
           OriginalTitle: data.original_title,
-          year: data.release_date.split('-')[0], // Assuming year is the first part of release_date
+         
           Id: data.id.toString(),
           type: "Movie", // Assuming type as Movie
           PosterPath: data.poster_path,
           genre: data.genres.map((g: any) => g.name).join(', '), // Joining genre names
           ReleaseDate: data.release_date,
+          Overview: data.overview,
         };
 
         setMovie(mappedData);
@@ -89,35 +79,30 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({favorites, setFavorites}) =>
       </Box>
     );
   }
-
   return (
-    <Box p={4}>
-      <Image
-    src={`https://image.tmdb.org/t/p/w500${movie.PosterPath}}`}
-        alt={movie.OriginalTitle}
-        
-      />
-      <Box p={4}>
-        <Text fontWeight="bold" fontSize="xl" className="movie-title">
-          {movie.OriginalTitle}
-        </Text>
-        <Text>Year: {movie.year}</Text>
-        <Text>Genre: {movie.genre}</Text>
-        <Text>Type: {movie.type}</Text>
-        <Text>Release Date: {movie.ReleaseDate}</Text>
-        <IconButton 
-          aria-label={
-           favorites.has(movie.Id) ? "Remove from favorites" : "Add to favorites"
-          } 
-          icon={favorites.has(movie.Id) ? <FaHeart /> : <FaRegHeart />} 
+    <Box className="movie-details-container">
+      <Box className="movie-image-container">
+        <Image
+          src={`https://image.tmdb.org/t/p/w500${movie.PosterPath}`}
+          alt={movie.OriginalTitle}
+          className="movie-image"
+        />
+        <IconButton
+          aria-label={favorites.has(movie.Id) ? "Remove from favorites" : "Add to favorites"}
+          icon={favorites.has(movie.Id) ? <FaHeart /> : <FaRegHeart />}
           onClick={() => toggleFavorite(movie.Id)}
           variant="ghost"
           colorScheme={favorites.has(movie.Id) ? "red" : "gray"}
           size="lg"
-          position="absolute"
-          top="4"
-          right="4"
+          className="favorite-button"
         />
+      </Box>
+      <Box className="movie-info">
+        <Heading as="h1" className="movie-title">{movie.OriginalTitle}</Heading>
+        <Text className="movie-genre">Genre: {movie.genre}</Text>
+        <Text className="movie-text">Overview: {movie.Overview}</Text>
+        <Text className="movie-text">Type: {movie.type}</Text>
+        <Text className="movie-text">Release Date: {movie.ReleaseDate}</Text>
       </Box>
     </Box>
   );

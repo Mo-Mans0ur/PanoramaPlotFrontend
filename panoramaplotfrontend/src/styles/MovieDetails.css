@@ -1,55 +1,64 @@
 .movie-details-container {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    background-color: #1a202c; /* Adjust based on light/dark mode */
-    color: white; /* Adjust based on light/dark mode */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .movie-image-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-  
-  .movie-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 10px;
-  }
-  
-  .movie-info {
-    width: 100%;
-  }
-  
-  .movie-title {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-    text-align: center;
-  }
-  
-  .movie-date {
-    color: gray;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  .movie-genre,
-  .movie-text {
-    margin-bottom: 10px;
-  }
-  
-  .movie-favorite-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-  }
-  
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #1a202c;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.movie-image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.movie-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  transition: transform 0.2s;
+}
+
+.movie-image:hover {
+  transform: scale(1.05);
+}
+
+.movie-info {
+  width: 100%;
+}
+
+.movie-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #ffdd57; /* Different color for the title */
+}
+
+.movie-genre,
+.movie-text {
+  margin-bottom: 10px;
+  color: #c6cfda; /* Lighter text color */
+}
+
+.movie-genre {
+  font-style: italic;
+  color: blue;
+}
+
+.movie-text {
+  font-size: 1.1rem;
+}
+
+.movie-favorite-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}

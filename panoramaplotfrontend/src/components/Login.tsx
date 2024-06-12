@@ -1,61 +1,98 @@
-// src/components/Login.tsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Box, FormControl, FormLabel, Input, Button, Text, Center, Heading } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Input,
+  Heading,
+  useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+} from '@chakra-ui/react';
+import { useAuth } from '../components/AuthContext'; // Correct import path
 
 const Login: React.FC = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
+  const { login } = useAuth();
+  const toast = useToast();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
+  const handleLogin = async () => {
     try {
       const response = await fetch('http://localhost:5074/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ username, password }),
       });
 
-      if (!response.ok) {
-        throw new Error('Invalid credentials');
-      }
-
       const data = await response.json();
-      // Assuming the backend returns a token
-      const token = data.token;
 
-      // Save the token to localStorage
-      localStorage.setItem('token', token);
-
-      // Redirect to the homepage or any other page
-      navigate('/');
-    } catch (error) {
-      setError((error as Error).message);
+      if (response.ok) {
+        login(data.token);
+        toast({
+          title: 'Login successful.',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+        onClose();
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error: any) { // Handle error type
+      toast({
+        title: 'Login failed.',
+        description: error.message,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
   return (
-    <Center height="100vh">
-      <Box maxWidth="400px" width="100%" p={6} borderWidth="1px" borderRadius="lg" boxShadow="lg">
-        <Heading as="h2" size="lg" textAlign="center" mb={6}>Login</Heading>
-        {error && <Text color="red.500" mb={4}>{error}</Text>}
-        <form onSubmit={handleLogin}>
-          <FormControl id="username" mb={4}>
-            <FormLabel>Username</FormLabel>
-            <Input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
-          </FormControl>
-          <FormControl id="password" mb={4}>
-            <FormLabel>Password</FormLabel>
-            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          </FormControl>
-          <Button type="submit" colorScheme="blue" width="full">Login</Button>
-        </form>
-      </Box>
-    </Center>
+    <>
+      <Button onClick={onOpen}>Login</Button>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Account</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Heading size="md">Login</Heading>
+            <Input
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              mt={4}
+            />
+            <Input
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              mt={4}
+              type="password"
+            />
+          </ModalBody>
+
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleLogin}>
+              Login
+            </Button>
+            <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
 

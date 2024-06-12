@@ -1,74 +1,70 @@
 /* src/styles/Navbar.css */
 .navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem 1rem;
-    background-color: #2d3748;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .navbar-logo img {
-    width: 80px;
-    height: auto;
-  }
-  
-  .navbar-search {
-    display: flex;
-    align-items: center;
-    flex: 1;
-    max-width: 600px;
-    margin: 0 2rem;
-  }
-  
-  .navbar-search input {
-    flex: 1;
-    padding: 0.5rem;
-    margin-right: 0.5rem;
-    border: none;
-    border-radius: 4px;
-  }
-  
-  .navbar-search button {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    background-color: #319795;
-    color: white;
-    cursor: pointer;
-  }
-  
-  .navbar-buttons {
-    display: flex;
-    align-items: center;
-  }
-  
-  .navbar-buttons button {
-    margin-left: 0.5rem;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    background-color: #3182ce;
-    color: white;
-    cursor: pointer;
-  }
-  
-  .modal-content {
-    background-color: #1a202c;
-    color: white;
-  }
-  
-  .modal-header, .modal-footer {
-    border-color: #2d3748;
-  }
-  
-  .tab {
-    background-color: #2d3748;
-    color: white;
-  }
-  
-  .tab-list .tab[aria-selected="true"] {
-    background-color: #319795;
-    color: white;
-  }
-  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background-color: #2d3748;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-logo img {
+  width: 50px;
+  height: auto;
+  margin-right: 0.5rem;
+}
+
+.navbar-logo-name {
+  font-weight: bold;
+  font-size: 1.25rem;
+  color: white;
+}
+
+.navbar-search {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 600px;
+  margin: 0 2rem;
+}
+
+.navbar-search input {
+  flex: 1;
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+  border: none;
+  border-radius: 4px;
+}
+
+.navbar-search input::placeholder {
+  color: rgba(255, 255, 255, 0.829); /* Lighter color for placeholder */
+}
+
+.navbar-search button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #319795;
+  color: white;
+  cursor: pointer;
+}
+
+.navbar-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-buttons button {
+  margin-left: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #3182ce;
+  color: white;
+  cursor: pointer;
+}

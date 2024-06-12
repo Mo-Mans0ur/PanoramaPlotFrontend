@@ -1,14 +1,4 @@
 import { extendTheme, ThemeConfig } from '@chakra-ui/react';
-import { GlobalStyleProps } from '@chakra-ui/theme-tools';
-
-const styles = {
-  global: (props: GlobalStyleProps) => ({
-    body: {
-      bg: props.colorMode === 'dark' ? 'gray.800' : 'gray.100',
-      color: props.colorMode === 'dark' ? 'white' : 'black',
-    },
-  }),
-};
 
 const config: ThemeConfig = {
   initialColorMode: 'light',
@@ -17,7 +7,6 @@ const config: ThemeConfig = {
 
 const theme = extendTheme({
   config,
-  styles,
   fonts: {
     heading: 'Arial, sans-serif',
     body: 'Arial, sans-serif',
@@ -42,11 +31,11 @@ const theme = extendTheme({
         fontWeight: 'bold',
       },
       variants: {
-        movieTitle: (props: GlobalStyleProps) => ({
+        movieTitle: {
           fontSize: 'lg',
-          color: props.colorMode === 'dark' ? 'white' : 'black',
+          color: 'inherit',
           textShadow: '0 1px 3px rgba(0, 0, 0, 0.6)',
-        }),
+        },
       },
     },
   },

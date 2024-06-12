@@ -1,36 +1,19 @@
 import React from "react";
-import { Box, Text } from "@chakra-ui/react";
-
-interface Movie {
-  title: string;
-  year: string;
-  Id: string;
-  type: string;
-  posterPath: string;
-  genre: string;
-}
+import { Box, Heading } from "@chakra-ui/react";
+import { Movie } from "../types";
 
 interface CategoryProps {
-  
   nextUrl: string;
   prevUrl: string;
   favorites: Set<string>;
   setFavorites: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
-const Category: React.FC<CategoryProps> = ({
-  
-  nextUrl,
-  prevUrl,
-  favorites,
-  setFavorites,
-}) => {
+const Category: React.FC<CategoryProps> = ({ nextUrl, prevUrl, favorites, setFavorites }) => {
   return (
-    <Box p={4}>
-      {/* Render your category movies here */}
-      
-        
-      
+    <Box>
+      <Heading as="h2">Category Component</Heading>
+      {/* Add your category component logic here */}
     </Box>
   );
 };
