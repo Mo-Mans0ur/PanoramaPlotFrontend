@@ -11,12 +11,14 @@ import {
   Heading,
   Button,
   useToast,
+  Select,
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import "../styles/Watchlist.css";
 import { Movie } from "../types";
 import { useAuth } from "../components/AuthContext";
+import Genre from "../types/Genre";
 
 interface WatchlistProps {
   searchResults: Movie[];
@@ -40,38 +42,41 @@ const Watchlist: React.FC<WatchlistProps> = ({
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [selectedGenre, setSelectedGenre] = useState<string>("");
   const { colorMode } = useColorMode();
   const toast = useToast();
 
-  useEffect(() => {
-    const fetchMovies = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`http://localhost:5074/movies?page=${page}`);
-        if (!response.ok) {
-          const errorText = await response.text(); // Get the full error response
-          throw new Error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
-        }
-        const data = await response.json();
-        const newMovies = data.data;
-
-        // Remove duplicates using a Map
-        const uniqueMoviesMap = new Map();
-        [...movies, ...newMovies].forEach((movie: Movie) => {
-          uniqueMoviesMap.set(movie.Id, movie);
-        });
-        const uniqueMovies = Array.from(uniqueMoviesMap.values());
-
-        setMovies(uniqueMovies);
-      } catch (error) {
-        console.error("Error fetching movies:", error);
-      } finally {
-        setLoading(false);
+  const fetchMovies = async () => {
+    setLoading(true);
+    try {
+      const genreParam = selectedGenre ? `&genre=${selectedGenre}` : "";
+      const response = await fetch(`http://localhost:5074/movies?page=${page}${genreParam}`);
+      if (!response.ok) {
+        const errorText = await response.text(); // Get the full error response
+        throw new Error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
       }
-    };
+      const data = await response.json();
+      const newMovies = data.data;
 
+      // Remove duplicates using a Map
+      const uniqueMoviesMap = new Map();
+      [...movies, ...newMovies].forEach((movie: Movie) => {
+        uniqueMoviesMap.set(movie.Id, movie);
+      });
+      const uniqueMovies = Array.from(uniqueMoviesMap.values());
+
+      setMovies(uniqueMovies);
+    } catch (error) {
+      console.error("Error fetching movies:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchMovies();
-  }, [page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, selectedGenre]);
 
   useEffect(() => {
     if (searchText) {
@@ -104,6 +109,12 @@ const Watchlist: React.FC<WatchlistProps> = ({
     setPage((prevPage) => prevPage + 1);
   };
 
+  const handleGenreChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedGenre(event.target.value);
+    setMovies([]); // Clear movies when changing genre
+    setPage(1); // Reset page when changing genre
+  };
+
   if (loading && movies.length === 0) {
     return (
       <Center height="100vh">
@@ -126,6 +137,24 @@ const Watchlist: React.FC<WatchlistProps> = ({
 
   return (
     <Box p={4}>
+      <Box display="flex" justifyContent="center" mb={4}>
+        <Select
+          placeholder="Select genre"
+          onChange={handleGenreChange}
+          value={selectedGenre}
+          width="200px"
+          aria-label="Select genre"
+          title="Select genre"
+        >
+          {Object.entries(Genre)
+            .filter(([key, value]) => isNaN(Number(key)))
+            .map(([key, value]) => (
+              <option key={value as number} value={value as number}>
+                {key}
+              </option>
+            ))}
+        </Select>
+      </Box>
       {isLoggedIn && favoriteMovies.length > 0 && (
         <Box mb={6}>
           <Heading as="h2" size="lg" mb={4}>

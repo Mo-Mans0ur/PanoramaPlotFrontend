@@ -92,7 +92,7 @@ const Favorites: React.FC<FavoritesProps> = ({
                   {movie.OriginalTitle}
                 </Text>
                 <Text fontSize="sm">{movie.ReleaseDate}</Text>
-                <Text fontSize="sm">Genre: {movie.genre}</Text>
+                <Text fontSize="sm">Genre: {movie.GenreIds}</Text>
               </Box>
             </RouterLink>
             <IconButton

@@ -15,11 +15,11 @@ const Footer: React.FC = () => {
         </Text>
         <Text mb={2}>
           Made with ❤️ by
-          <Link href="https://github.com/your-github-username" ml={1} color="teal.500" isExternal>
+          <Link href="https://github.com/Mo-Mans0ur" ml={1} color="teal.500" isExternal>
             <FaGithub style={{ display: 'inline', marginRight: '4px' }} /> Mo 
           </Link>
           {' and '}
-          <Link href="https://github.com/your-github-username" ml={1} color="teal.500" isExternal>
+          <Link href="https://github.com/Nicolas-Mousten" ml={1} color="teal.500" isExternal>
             <FaGithub style={{ display: 'inline', marginRight: '4px' }} /> Nicolas
           </Link>
         </Text>

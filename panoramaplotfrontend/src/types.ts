@@ -8,7 +8,7 @@ export interface Movie {
   OriginalTitle: string;
   Id: string;
   PosterPath: string;
-  genre: string;
+  GenreIds: number[];
   ReleaseDate: string;
   Overview: string;
 }

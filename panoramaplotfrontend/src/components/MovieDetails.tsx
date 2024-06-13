@@ -3,15 +3,18 @@ import { useParams, useNavigate} from "react-router-dom";
 import { Box, Text, Image, IconButton, Spinner, Center, useToast, Button } from "@chakra-ui/react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { Movie } from "../types";
+import Genre from "../types/Genre";
 import { useAuth } from "../components/AuthContext";
 import '../styles/MovieDetails.css'; // Import the CSS file
 
 interface MovieDetailsProps {
   favorites: Set<string>;
   setFavorites: React.Dispatch<React.SetStateAction<Set<string>>>;
+  MovieId: number;
+  GenreIds: number[];
 }
 
-const MovieDetails: React.FC<MovieDetailsProps> = ({ favorites, setFavorites }) => {
+const MovieDetails: React.FC<MovieDetailsProps> = ({ favorites, setFavorites, MovieId ,GenreIds}) => {
   const { id } = useParams<{ id: string }>();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -34,7 +37,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ favorites, setFavorites }) 
           Id: data.id,
           OriginalTitle: data.original_title,
           PosterPath: data.poster_path,
-          genre: data.genres.map((genre: any) => genre.name).join(", "),
+          GenreIds: data.genres.map((genre: any) => Genre[genre.id] || genre.name).join(", "),
           ReleaseDate: data.release_date,
           Overview: data.overview,
           // Assuming you have a type field
@@ -110,7 +113,7 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({ favorites, setFavorites }) 
           {movie.OriginalTitle || "N/A"}
         </Text>
         <Text className="movie-text">{movie.ReleaseDate || "N/A"}</Text>
-        <Text className="movie-genre">Genre: {movie.genre || "N/A"}</Text>
+        <Text className="movie-genre">Genre: {movie.GenreIds || "N/A"}</Text>
         <Box className="movie-favorite-button">
           <IconButton
             aria-label={

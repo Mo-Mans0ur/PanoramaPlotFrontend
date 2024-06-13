@@ -11,6 +11,7 @@ import theme from './theme';
 import './styles/App.css';
 import { AuthProvider, useAuth } from './components/AuthContext';
 import { Movie } from './types';
+import Genre from './types/Genre';
 
 const AppContent: React.FC = () => {
   const [movieQuery, setMovieQuery] = useState('');
@@ -87,6 +88,8 @@ const AppContent: React.FC = () => {
           path="/movies/:id"
           element={
             <MovieDetails
+             MovieId={0}
+              GenreIds={[]}
               favorites={favorites}
               setFavorites={setFavorites}
             />
