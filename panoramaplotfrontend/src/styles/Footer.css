@@ -1,0 +1,36 @@
+.footer-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0; /* Adjust padding to ensure the footer has enough space */
+    background-color: #2b3241;
+    color: white;
+  }
+  
+  .footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .footer-image-container {
+    position: absolute;
+    bottom: 10px;
+    left: 10px; /* Change from right to left */
+    display: flex;
+    align-items: center; /* Aligns the image vertically with the text */
+  }
+  
+  .footer-image {
+    width: 80px;
+    height: auto;
+    transition: transform 0.2s;
+  }
+  
+  .footer-image:hover {
+    transform: scale(1.1);
+  }
+  

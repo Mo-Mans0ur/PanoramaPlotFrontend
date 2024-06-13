@@ -6,7 +6,7 @@ import Watchlist from './components/Watchlist';
 import MovieDetails from './components/MovieDetails';
 import Category from './components/Category';
 import Favorites from './components/Favorites';
-import Login from './components/Login';
+import Footer from './components/Footer';
 import theme from './theme';
 import './styles/App.css';
 import { AuthProvider, useAuth } from './components/AuthContext';
@@ -87,15 +87,14 @@ const AppContent: React.FC = () => {
           path="/movies/:id"
           element={
             <MovieDetails
-              nextUrl={nextUrl}
-              prevUrl={prevUrl}
               favorites={favorites}
               setFavorites={setFavorites}
             />
           }
         />
-        <Route path="/login" element={<Login />} />
+        
       </Routes>
+      <Footer />
     </>
   );
 };

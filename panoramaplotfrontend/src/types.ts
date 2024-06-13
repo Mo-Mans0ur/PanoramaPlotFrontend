@@ -6,9 +6,7 @@ export interface MovieQuery {
   // src/types.ts
 export interface Movie {
   OriginalTitle: string;
-
   Id: string;
-  type: string;
   PosterPath: string;
   genre: string;
   ReleaseDate: string;
