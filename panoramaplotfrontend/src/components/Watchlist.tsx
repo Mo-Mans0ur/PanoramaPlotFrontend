@@ -11,8 +11,14 @@ import {
   Heading,
   Button,
   useToast,
-  Select,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuGroup,
+  useColorModeValue,
 } from "@chakra-ui/react";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import { Link as RouterLink } from "react-router-dom";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import "../styles/Watchlist.css";
@@ -42,40 +48,42 @@ const Watchlist: React.FC<WatchlistProps> = ({
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [selectedGenre, setSelectedGenre] = useState<string>("");
+  const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
   const { colorMode } = useColorMode();
+  const textColor = useColorModeValue("black", "white");
   const toast = useToast();
 
-  const fetchMovies = async () => {
-    setLoading(true);
-    try {
-      const genreParam = selectedGenre ? `&genre=${selectedGenre}` : "";
-      const response = await fetch(`http://localhost:5074/movies?page=${page}${genreParam}`);
-      if (!response.ok) {
-        const errorText = await response.text(); // Get the full error response
-        throw new Error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
-      }
-      const data = await response.json();
-      const newMovies = data.data;
-
-      // Remove duplicates using a Map
-      const uniqueMoviesMap = new Map();
-      [...movies, ...newMovies].forEach((movie: Movie) => {
-        uniqueMoviesMap.set(movie.Id, movie);
-      });
-      const uniqueMovies = Array.from(uniqueMoviesMap.values());
-
-      setMovies(uniqueMovies);
-    } catch (error) {
-      console.error("Error fetching movies:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchMovies = async () => {
+      setLoading(true);
+      try {
+        const genreParam = selectedGenre !== null ? `&genre=${selectedGenre}` : "";
+        const response = await fetch(
+          `http://localhost:5074/movies?page=${page}${genreParam}`
+        );
+        if (!response.ok) {
+          const errorText = await response.text(); // Get the full error response
+          throw new Error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
+        }
+        const data = await response.json();
+        const newMovies = data.data;
+
+        // Remove duplicates using a Map
+        const uniqueMoviesMap = new Map();
+        [...movies, ...newMovies].forEach((movie: Movie) => {
+          uniqueMoviesMap.set(movie.Id, movie);
+        });
+        const uniqueMovies = Array.from(uniqueMoviesMap.values());
+
+        setMovies(uniqueMovies);
+      } catch (error) {
+        console.error("Error fetching movies:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchMovies();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, selectedGenre]);
 
   useEffect(() => {
@@ -109,11 +117,15 @@ const Watchlist: React.FC<WatchlistProps> = ({
     setPage((prevPage) => prevPage + 1);
   };
 
-  const handleGenreChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedGenre(event.target.value);
+  const handleGenreChange = (genre: number | null) => {
+    setSelectedGenre(genre);
     setMovies([]); // Clear movies when changing genre
     setPage(1); // Reset page when changing genre
   };
+
+  const filteredMovies = selectedGenre
+    ? movies.filter((movie) => movie.GenreIds.includes(selectedGenre))
+    : movies;
 
   if (loading && movies.length === 0) {
     return (
@@ -132,28 +144,37 @@ const Watchlist: React.FC<WatchlistProps> = ({
   }
 
   const favoriteMovies = isLoggedIn
-    ? movies.filter((movie) => favorites.has(movie.Id))
+    ? filteredMovies.filter((movie) => favorites.has(movie.Id))
     : [];
+
+  const selectedGenreName = selectedGenre !== null
+    ? Object.keys(Genre).find(key => Genre[key as keyof typeof Genre] === selectedGenre)
+    : "All Genres";
+
+  const defaultPoster = `${process.env.PUBLIC_URL}/default_poster.jpg`; // Use process.env.PUBLIC_URL to ensure correct path
 
   return (
     <Box p={4}>
       <Box display="flex" justifyContent="center" mb={4}>
-        <Select
-          placeholder="Select genre"
-          onChange={handleGenreChange}
-          value={selectedGenre}
-          width="200px"
-          aria-label="Select genre"
-          title="Select genre"
-        >
-          {Object.entries(Genre)
-            .filter(([key, value]) => isNaN(Number(key)))
-            .map(([key, value]) => (
-              <option key={value as number} value={value as number}>
-                {key}
-              </option>
-            ))}
-        </Select>
+        <Menu>
+          <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="blue">
+            {selectedGenreName}
+          </MenuButton>
+          <MenuList>
+            <MenuGroup title="Genres">
+              <MenuItem key="all" onClick={() => handleGenreChange(null)}>
+                All Genres
+              </MenuItem>
+              {Object.entries(Genre)
+                .filter(([key, value]) => isNaN(Number(key)))
+                .map(([key, value]) => (
+                  <MenuItem key={value as number} onClick={() => handleGenreChange(value as number)}>
+                    {key}
+                  </MenuItem>
+                ))}
+            </MenuGroup>
+          </MenuList>
+        </Menu>
       </Box>
       {isLoggedIn && favoriteMovies.length > 0 && (
         <Box mb={6}>
@@ -174,18 +195,17 @@ const Watchlist: React.FC<WatchlistProps> = ({
                 position="relative"
               >
                 <RouterLink to={`/movies/${movie.Id}`}>
-                  <Image
-                    src={`https://image.tmdb.org/t/p/w500${movie.PosterPath}`}
+                  <ImageWithDefault
+                    src={movie.PosterPath ? `https://image.tmdb.org/t/p/w500${movie.PosterPath}` : defaultPoster}
                     alt={movie.OriginalTitle}
-                    onError={(e) =>
-                      (e.currentTarget.src = "/path/to/default/poster.jpg")
-                    }
+                    defaultSrc={defaultPoster}
                   />
                   <Box p={4}>
                     <Text
                       fontWeight="bold"
                       fontSize="xl"
                       className="movie-title"
+                      color={textColor}
                     >
                       {movie.OriginalTitle}
                     </Text>
@@ -220,7 +240,7 @@ const Watchlist: React.FC<WatchlistProps> = ({
         All Movies
       </Heading>
       <Grid templateColumns="repeat(auto-fill, minmax(200px, 1fr))" gap={6}>
-        {movies.map((movie) => (
+        {filteredMovies.map((movie) => (
           <Box
             key={movie.Id}
             className={`movie-card ${colorMode}`}
@@ -232,15 +252,17 @@ const Watchlist: React.FC<WatchlistProps> = ({
             transition="transform 0.2s"
           >
             <RouterLink to={`/movies/${movie.Id}`}>
-              <Image
-                src={`https://image.tmdb.org/t/p/w500${movie.PosterPath}`}
+              <ImageWithDefault
+                src={movie.PosterPath ? `https://image.tmdb.org/t/p/w500${movie.PosterPath}` : defaultPoster}
                 alt={movie.OriginalTitle}
+                defaultSrc={defaultPoster}
               />
               <Box p={4}>
                 <Text
                   fontWeight="bold"
                   fontSize="xl"
                   className="movie-title"
+                  color={textColor}
                 >
                   {movie.OriginalTitle}
                 </Text>
@@ -274,6 +296,21 @@ const Watchlist: React.FC<WatchlistProps> = ({
       </Center>
     </Box>
   );
+};
+
+const ImageWithDefault: React.FC<{ src: string; alt: string; defaultSrc: string }> = ({ src, alt, defaultSrc }) => {
+  const [imgSrc, setImgSrc] = useState(src);
+
+  useEffect(() => {
+    setImgSrc(src); // Reset image source when the source prop changes
+  }, [src]);
+
+  const handleError = () => {
+    console.log("Image failed to load, setting default image");
+    setImgSrc(defaultSrc);
+  };
+
+  return <Image src={imgSrc} alt={alt} onError={handleError} />;
 };
 
 export default Watchlist;

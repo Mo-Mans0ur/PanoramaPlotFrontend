@@ -62,3 +62,23 @@
   align-items: center;
   margin-top: 20px;
 }
+
+
+.select-genre {
+  width: 300px;
+  height: 40px;
+  color: white;
+  background-color: gray;
+  border: 1px solid white;
+  padding: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.select-genre option {
+  color: black;
+  background-color: white;
+}
+
