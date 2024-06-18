@@ -45,20 +45,20 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch }) => {
     }
   }, [isLoggedIn]);
 
-  const handleLogin = async () => {
+  const handleLogin = async (username: string, password: string) => {
     try {
       const response = await fetch("http://localhost:5074/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ Username: loginUsername, Password: loginPassword }),
+        body: JSON.stringify({ Username: username, Password: password }),
       });
 
       const data = await response.json();
       if (response.ok) {
         login(data.Token);
-        setUsername(loginUsername);
+        setUsername(username);
         onClose();
       } else {
         throw new Error(data.message || "Invalid credentials");
@@ -80,9 +80,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch }) => {
 
       const data = await response.json();
       if (response.ok) {
-        login(data.Token);
-        setUsername(registerUsername);
-        onClose();
+        await handleLogin(registerUsername, registerPassword); // Call handleLogin after successful registration
       } else {
         throw new Error(data.message || "Registration failed");
       }
@@ -213,7 +211,7 @@ const Navbar: React.FC<NavbarProps> = ({ onSearch }) => {
           <ModalFooter>
             {activeTab === 0 ? (
               <>
-                <Button colorScheme="blue" mr={3} onClick={handleLogin}>
+                <Button colorScheme="blue" mr={3} onClick={() => handleLogin(loginUsername, loginPassword)}>
                   Login
                 </Button>
                 <Button variant="ghost" onClick={onClose}>Cancel</Button>
