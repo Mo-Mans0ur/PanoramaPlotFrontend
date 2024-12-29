@@ -39,6 +39,7 @@ const AppContent: React.FC = () => {
     try {
       const response = await fetch(`http://localhost:5074/movies/search/${searchText}`);
       const data = await response.json();
+      
       setSearchResults(data.data);
     } catch (error) {
       console.error('Error fetching search results:', error);
